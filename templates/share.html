@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block title %}Share File{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-body p-5">
+
+                <h2 class="text-center mb-4">
+                    <i class="bi bi-share"></i> Share File
+                </h2>
+
+                <!-- File Info -->
+                <div class="alert alert-info">
+                    <h5>
+                        <i class="bi bi-file-earmark"></i> {{ file.filename }}
+                    </h5>
+                    <p class="mb-0">
+                        Share this link with anyone you want to share this file with.
+                    </p>
+                </div>
+
+                <!-- Share Link -->
+                <div class="mb-4">
+                    <label class="form-label fw-bold">Share Link</label>
+                    <div class="input-group">
+                        <input type="text"
+                               class="form-control"
+                               id="shareLink"
+                               value="{{ share_url }}"
+                               readonly>
+
+                        <button class="btn btn-outline-secondary"
+                                type="button"
+                                onclick="copyShareLink()">
+                            <i class="bi bi-clipboard"></i> Copy
+                        </button>
+                    </div>
+                    <div class="form-text">
+                        The recipient will need the encryption password to decrypt and download the file.
+                    </div>
+                </div>
+
+                <!-- Expiry Info -->
+                {% if file.expiry_date %}
+                <div class="alert {% if is_expired %}alert-danger{% else %}alert-warning{% endif %}">
+                    <strong>
+                        {% if is_expired %}
+                            ⚠️ Expired:
+                        {% else %}
+                            ⏰ Expires:
+                        {% endif %}
+                    </strong>
+                    {{ file.expiry_date.strftime('%Y-%m-%d %I:%M:%S %p') }}
+
+                    {% if is_expired %}
+                        <br>
+                        <small>This file is no longer available for download.</small>
+                    {% endif %}
+                </div>
+                {% endif %}
+
+                <!-- Security Notice -->
+                <div class="alert alert-warning mt-3">
+                    <h5>
+                        <i class="bi bi-exclamation-triangle"></i> Important Security Notice
+                    </h5>
+                    <ul class="mb-0">
+                        <li>Share the encryption password separately through a secure channel</li>
+                        <li>Do not share the password along with the link</li>
+                        <li>The recipient needs BOTH the link AND the password</li>
+                        <li>This link will work until the file is deleted or expired</li>
+                    </ul>
+                </div>
+
+                <!-- Back Button -->
+                <div class="d-grid gap-2 mt-4">
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-primary">
+                        <i class="bi bi-arrow-left"></i> Back to Dashboard
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Copy Script -->
+<script>
+function copyShareLink() {
+    const copyText = document.getElementById("shareLink");
+
+    navigator.clipboard.writeText(copyText.value)
+        .then(() => {
+            alert("Link copied to clipboard!");
+        })
+        .catch(err => {
+            alert("Failed to copy link.");
+        });
+}
+</script>
+
+{% endblock %}
