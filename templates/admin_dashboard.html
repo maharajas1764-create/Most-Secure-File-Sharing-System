@@ -4,190 +4,422 @@
 {% block content %}
 
 <style>
-/* ===== SIDEBAR STYLE ===== */
-.sidebar-custom {
-    height: 100%;
-    background: linear-gradient(180deg, #141E30, #243B55);
-    box-shadow: 4px 0 15px rgba(0,0,0,0.4);
+/* Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
-.admin-avatar i {
-    font-size: 65px;
-    color: #ffffff;
+body {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+}
+
+/* Sidebar */
+.sidebar-custom {
+    height: 85vh;
+    background: #2c3e50;
+    box-shadow: 4px 0 15px rgba(0,0,0,0.2);
+}
+
+.admin-avatar {
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 10px;
+    background: linear-gradient(135deg, #ff6b6b, #feca57);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.8rem;
+    box-shadow: 0 5px 15px rgba(255,107,107,0.3);
 }
 
 .sidebar-link {
-    color: #ffffff;
-    margin-bottom: 10px;
-    border-radius: 10px;
-    transition: all 0.3s ease;
+    color: #b2bec3;
+    padding: 10px 15px;
+    margin: 3px 12px;
+    border-radius: 8px;
+    text-decoration: none;
+    display: block;
+    transition: 0.2s;
 }
 
 .sidebar-link:hover {
-    background: rgba(255,255,255,0.15);
-    transform: translateX(5px);
+    color: white;
+    background: rgba(255,255,255,0.1);
 }
 
 .sidebar-link.active {
-    background: #0d6efd !important;
-    font-weight: 500;
+    background: linear-gradient(135deg, #ff6b6b, #feca57);
+    color: white;
+    box-shadow: 0 5px 10px rgba(255,107,107,0.3);
 }
 
 .clock-box {
-    background: rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.05);
+    border-radius: 10px;
+    padding: 12px;
+    margin: 15px;
     text-align: center;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.2);
+}
+
+#current-datetime {
+    color: #feca57;
+    font-size: 0.9rem;
+    margin-top: 5px;
+}
+
+.logout-btn {
+    background: #ff6b6b;
+    border-radius: 8px;
+    color: white;
+    padding: 10px 15px;
+    margin: 15px;
+    display: block;
+    text-align: center;
+    text-decoration: none;
+    transition: 0.2s;
+    box-shadow: 0 5px 15px rgba(255,107,107,0.3);
 }
 
 .logout-btn:hover {
-    background-color: #bb2d3b;
+    background: #ee5a52;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(255,107,107,0.4);
 }
 
-.card {
-    transition: 0.3s;
-}
-.card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+/* Main Content */
+main {
+    background: #f5f7fa;
+    min-height: 85vh;
+    height: 85vh;
+    overflow-y: auto;
+    padding: 20px;
 }
 
-.delete-user-btn {
-    color: #dc3545;
-    cursor: pointer;
-    font-size: 1.2rem;
+.tab-content {
+    background: white;
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+/* Stat Cards */
+.stat-card {
+    background: white;
+    border-radius: 16px;
+    padding: 25px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
     transition: 0.2s;
 }
+
+.stat-card:hover {
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    transform: translateY(-2px);
+}
+
+.stat-card .stat-label {
+    color: #8395a7;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.stat-card .stat-value {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-top: 5px;
+}
+
+/* Tables */
+.table-container {
+    background: white;
+    border-radius: 16px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+
+.table-header {
+    background: #2c3e50;
+    padding: 12px 15px;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 16px 16px 0 0;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table th {
+    background: #f8f9fd;
+    color: #2c3e50;
+    font-weight: 600;
+    font-size: 0.8rem;
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.table td {
+    padding: 10px 15px;
+    color: #4a5568;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+/* Search */
+.search-box {
+    position: relative;
+    margin-bottom: 20px;
+}
+
+.search-box input {
+    width: 100%;
+    padding: 10px 15px 10px 40px;
+    border: 1px solid #e2e8f0;
+    border-radius: 30px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.search-box input:focus {
+    outline: none;
+    border-color: #ff6b6b;
+    box-shadow: 0 0 0 3px rgba(255,107,107,0.1);
+}
+
+.search-box i {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #ff6b6b;
+}
+
+/* Badges */
+.badge {
+    padding: 4px 10px;
+    border-radius: 30px;
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+.badge.bg-success { background: #1dd1a1; color: white; }
+.badge.bg-danger { background: #ff6b6b; color: white; }
+.badge.bg-info { background: #48dbfb; color: white; }
+
+/* Delete Button */
+.delete-user-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    background: #ffe8e8;
+    color: #ff6b6b;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: 0.2s;
+    box-shadow: 0 2px 5px rgba(255,107,107,0.2);
+}
+
 .delete-user-btn:hover {
-    color: #bb2d3b;
-    transform: scale(1.1);
+    background: #ff6b6b;
+    color: white;
+    box-shadow: 0 5px 10px rgba(255,107,107,0.3);
+}
+
+/* Modal */
+.modal-content {
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+}
+
+.modal-header {
+    background: #2c3e50;
+    color: white;
+    padding: 15px;
+}
+
+.modal-body {
+    padding: 20px;
+    text-align: center;
+}
+
+.modal-footer {
+    padding: 15px;
+}
+
+.modal-footer .btn {
+    padding: 8px 20px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.modal-footer .btn-secondary {
+    background: #95a5a6;
+    color: white;
+}
+
+.modal-footer .btn-danger {
+    background: #ff6b6b;
+    color: white;
+}
+
+/* Headings */
+h3 {
+    color: #2c3e50;
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+h3 i {
+    color: #ff6b6b;
+    font-size: 1.6rem;
 }
 </style>
 
 <div class="container-fluid">
     <div class="row">
-        <!-- ===== SIDEBAR ===== -->
-        <div class="col-md-3 col-lg-2 d-md-block sidebar collapse vh-100 p-0">
-            <div class="d-flex flex-column flex-shrink-0 p-3 text-white sidebar-custom">
-                <div class="text-center mb-4">
-                    <div class="admin-avatar mb-2">
-                        <i class="bi bi-person-circle"></i>
+        <!-- Sidebar -->
+        <div class="col-md-3 col-lg-2 d-md-block sidebar collapse p-0">
+            <div class="d-flex flex-column p-3 sidebar-custom">
+                <div class="text-center mb-3">
+                    <div class="admin-avatar">
+                        <i class="bi bi-shield-check"></i>
                     </div>
-                    <h6 class="mb-0">Administrator</h6>
-                    <small class="text-light">Secure File System</small>
+                    <h6 style="color: #feca57;">Administrator</h6>
+                    <small style="color: #b2bec3;">File System</small>
                 </div>
-                <hr class="text-light">
-                <div class="mb-4 p-3 clock-box rounded">
-                    <i class="bi bi-calendar3"></i>
-                    <div id="current-datetime" class="small mt-2"></div>
+
+                <div class="clock-box">
+                    <i class="bi bi-calendar3" style="color: #feca57;"></i>
+                    <div id="current-datetime"></div>
                 </div>
+
                 <ul class="nav nav-pills flex-column mb-auto">
-                    <li class="nav-item">
+                    <li>
                         <a class="nav-link active sidebar-link" data-bs-toggle="tab" href="#dashboard">
-                            <i class="bi bi-speedometer2 me-2"></i> Dashboard
+                            <i class="bi bi-grid me-2"></i> Dashboard
                         </a>
                     </li>
                     <li>
                         <a class="nav-link sidebar-link" data-bs-toggle="tab" href="#users">
                             <i class="bi bi-people me-2"></i> Users
+                            <span class="badge" style="background: #feca57; color: #2c3e50; float: right;">{{ users|length }}</span>
                         </a>
                     </li>
                     <li>
                         <a class="nav-link sidebar-link" data-bs-toggle="tab" href="#files">
-                            <i class="bi bi-files me-2"></i> Files
+                            <i class="bi bi-folder me-2"></i> Files
+                            <span class="badge" style="background: #feca57; color: #2c3e50; float: right;">{{ files|length }}</span>
                         </a>
                     </li>
                 </ul>
-                <hr class="text-light">
-                <a href="{{ url_for('admin_logout') }}" class="btn btn-danger w-100 logout-btn">
+
+                <a href="{{ url_for('admin_logout') }}" class="logout-btn">
                     <i class="bi bi-box-arrow-right me-2"></i> Logout
                 </a>
             </div>
         </div>
 
-        <!-- ===== MAIN CONTENT ===== -->
+        <!-- Main Content -->
         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-            <div class="tab-content mt-4">
-                <!-- ===== DASHBOARD ===== -->
+            <div class="tab-content">
+                <!-- Dashboard -->
                 <div class="tab-pane fade show active" id="dashboard">
-                    <h3><i class="bi bi-speedometer2"></i> Admin Dashboard</h3>
-                    <div class="row mt-4">
-                        <div class="col-md-3 mb-3">
-                            <div class="card bg-primary text-white text-center">
-                                <div class="card-body">
-                                    <h6>Total Users</h6>
-                                    <h2>{{ total_users }}</h2>
-                                </div>
+                    <h3><i class="bi bi-grid"></i> Dashboard</h3>
+                    
+                    <div class="row g-3">
+                        <div class="col-md-3">
+                            <div class="stat-card">
+                                <div class="stat-label">Users</div>
+                                <div class="stat-value">{{ total_users }}</div>
                             </div>
                         </div>
-                        <div class="col-md-3 mb-3">
-                            <div class="card bg-success text-white text-center">
-                                <div class="card-body">
-                                    <h6>Total Files</h6>
-                                    <h2>{{ total_files }}</h2>
-                                </div>
+                        <div class="col-md-3">
+                            <div class="stat-card">
+                                <div class="stat-label">Files</div>
+                                <div class="stat-value">{{ total_files }}</div>
                             </div>
                         </div>
-                        <div class="col-md-3 mb-3">
-                            <div class="card bg-info text-white text-center">
-                                <div class="card-body">
-                                    <h6>Active Files</h6>
-                                    <h2>{{ active_files }}</h2>
-                                </div>
+                        <div class="col-md-3">
+                            <div class="stat-card">
+                                <div class="stat-label">Active</div>
+                                <div class="stat-value">{{ active_files }}</div>
                             </div>
                         </div>
-                        <div class="col-md-3 mb-3">
-                            <div class="card bg-danger text-white text-center">
-                                <div class="card-body">
-                                    <h6>Expired Files</h6>
-                                    <h2>{{ expired_files }}</h2>
-                                </div>
+                        <div class="col-md-3">
+                            <div class="stat-card">
+                                <div class="stat-label">Expired</div>
+                                <div class="stat-value">{{ expired_files }}</div>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- ===== USERS ===== -->
+                <!-- Users -->
                 <div class="tab-pane fade" id="users">
-                    <h3><i class="bi bi-people"></i> Registered Users</h3>
-                    <div class="mb-3">
-                        <input type="text" id="userSearch" class="form-control"
-                               placeholder="Search by username or email...">
+                    <h3><i class="bi bi-people"></i> Users</h3>
+                    
+                    <div class="search-box">
+                        <i class="bi bi-search"></i>
+                        <input type="text" id="userSearch" placeholder="Search users...">
                     </div>
-                    <div class="card shadow">
-                        <div class="card-header bg-dark text-white">User List</div>
-                        <div class="card-body table-responsive">
-                            <table class="table table-hover align-middle" id="usersTable">
-                                <thead class="table-light">
+
+                    <div class="table-container">
+                        <div class="table-header">
+                            <span><i class="bi bi-person-lines-fill me-2"></i>User List</span>
+                            <span class="badge" style="background: #feca57; color: #2c3e50;">{{ users|length }}</span>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table" id="usersTable">
+                                <thead>
                                     <tr>
                                         <th>ID</th>
-                                        <th>Username</th>
+                                        <th>User</th>
                                         <th>Email</th>
                                         <th>Joined</th>
-                                        <th>Last Login</th>
-                                        <th>Total Files</th>
-                                        <th>Action</th>
+                                        <th>Files</th>
+                                        <th></th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {% for user in users %}
                                     <tr>
                                         <td>{{ user.id }}</td>
-                                        <td>{{ user.username }}</td>
-                                        <td>{{ user.email }}</td>
-                                        <td>{{ user.created_at.strftime('%d-%m-%Y %H:%M:%S') }}</td>
                                         <td>
-                                            {{ user.last_login.strftime('%d-%m-%Y %H:%M:%S')
-                                               if user.last_login else 'Never' }}
+                                            {{ user.username }}
+                                            {% if user.username == 'admin' %}
+                                            <span class="badge bg-info">Admin</span>
+                                            {% endif %}
                                         </td>
+                                        <td>{{ user.email }}</td>
+                                        <td>{{ user.created_at.strftime('%d/%m/%Y %H:%M:%S') }}</td>
                                         <td>{{ user.files|length }}</td>
                                         <td>
                                             {% if user.username != 'admin' %}
-                                            <i class="bi bi-trash delete-user-btn" 
-                                               data-bs-toggle="modal" 
-                                               data-bs-target="#deleteModal"
-                                               data-userid="{{ user.id }}"
-                                               data-username="{{ user.username }}"></i>
-                                            {% else %}
-                                            <span class="text-muted">-</span>
+                                            <span class="delete-user-btn" 
+                                                  data-bs-toggle="modal" 
+                                                  data-bs-target="#deleteModal"
+                                                  data-userid="{{ user.id }}"
+                                                  data-username="{{ user.username }}">
+                                                <i class="bi bi-trash"></i>
+                                            </span>
                                             {% endif %}
                                         </td>
                                     </tr>
@@ -198,25 +430,32 @@
                     </div>
                 </div>
 
-                <!-- ===== FILES ===== -->
+                <!-- Files -->
                 <div class="tab-pane fade" id="files">
-                    <h3><i class="bi bi-files"></i> File Details</h3>
-                    <div class="mb-3">
-                        <input type="text" id="fileSearch" class="form-control"
-                               placeholder="Search by filename...">
+                    <h3><i class="bi bi-folder"></i> Files</h3>
+                    
+                    <div class="search-box">
+                        <i class="bi bi-search"></i>
+                        <input type="text" id="fileSearch" placeholder="Search files...">
                     </div>
-                    <div class="card shadow">
-                        <div class="card-header bg-dark text-white">All Files</div>
-                        <div class="card-body table-responsive">
-                            <table class="table table-hover align-middle" id="filesTable">
-                                <thead class="table-light">
+
+                    <div class="table-container">
+                        <div class="table-header">
+                            <span><i class="bi bi-file-earmark-text me-2"></i>File List</span>
+                            <div>
+                                <span class="badge bg-success me-2">{{ active_files }} Active</span>
+                                <span class="badge bg-danger">{{ expired_files }} Expired</span>
+                            </div>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table" id="filesTable">
+                                <thead>
                                     <tr>
                                         <th>ID</th>
-                                        <th>Filename</th>
+                                        <th>File</th>
                                         <th>Owner</th>
                                         <th>Size</th>
                                         <th>Uploaded</th>
-                                        <th>Expires</th>
                                         <th>Status</th>
                                     </tr>
                                 </thead>
@@ -226,22 +465,15 @@
                                         <td>{{ file.id }}</td>
                                         <td>{{ file.filename }}</td>
                                         <td>{{ file.owner.username }}</td>
-                                        <td>{{ (file.file_size / 1024) | round(2) }} KB</td>
-                                        <td>{{ file.upload_date.strftime('%d-%m-%Y %H:%M:%S') }}</td>
-                                        <td>
-                                            {% if file.expiry_date %}
-                                                {{ file.expiry_date.strftime('%d-%m-%Y %H:%M:%S') }}
-                                            {% else %}
-                                                Never
-                                            {% endif %}
-                                        </td>
+                                        <td>{{ (file.file_size / 1024) | round(1) }} KB</td>
+                                        <td>{{ file.upload_date.strftime('%d/%m/%Y %H:%M:%S') }}</td>
                                         <td>
                                             {% if file.expiry_date and file.expiry_date < now %}
                                                 <span class="badge bg-danger">Expired</span>
-                                            {% elif file.expiry_date and file.expiry_date >= now %}
+                                            {% elif file.expiry_date %}
                                                 <span class="badge bg-success">Active</span>
                                             {% else %}
-                                                <span class="badge bg-info">No Expiry</span>
+                                                <span class="badge bg-info">Permanent</span>
                                             {% endif %}
                                         </td>
                                     </tr>
@@ -256,17 +488,18 @@
     </div>
 </div>
 
-<!-- Delete Confirmation Modal -->
+<!-- Delete Modal -->
 <div class="modal fade" id="deleteModal" tabindex="-1">
-    <div class="modal-dialog">
+    <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
-            <div class="modal-header bg-danger text-white">
-                <h5 class="modal-title">Confirm Delete</h5>
+            <div class="modal-header">
+                <h5 class="modal-title">Delete User</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <p>Are you sure you want to delete user <strong id="deleteUsername"></strong>?</p>
-                <p class="text-danger"><small>This will also delete all files uploaded by this user!</small></p>
+                <i class="bi bi-person-x-fill" style="font-size: 3rem; color: #ff6b6b;"></i>
+                <p class="mt-3">Delete <strong id="deleteUsername"></strong>?</p>
+                <p style="color: #ff6b6b;">All files will be deleted</p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -281,37 +514,43 @@
 <script>
 function updateDateTime() {
     const now = new Date();
-    document.getElementById("current-datetime").innerHTML =
-        now.toLocaleString();
+    const day = String(now.getDate()).padStart(2, '0');
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const year = now.getFullYear();
+    const formattedDate = `${day}-${month}-${year}`;
+    
+    let hours = now.getHours();
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12 || 12;
+    const formattedTime = `${String(hours).padStart(2, '0')}:${minutes}:${seconds} ${ampm}`;
+    
+    document.getElementById("current-datetime").innerHTML = `${formattedDate}<br>${formattedTime}`;
 }
 updateDateTime();
 setInterval(updateDateTime, 1000);
 
-// Live user search
-document.getElementById("userSearch").addEventListener("keyup", function () {
+// Search
+document.getElementById("userSearch")?.addEventListener("keyup", function() {
     let filter = this.value.toLowerCase();
-    let rows = document.querySelectorAll("#usersTable tbody tr");
-    rows.forEach(row => {
-        row.style.display = row.innerText.toLowerCase().includes(filter) ? "" : "none";
+    document.querySelectorAll("#usersTable tbody tr").forEach(row => {
+        row.style.display = row.textContent.toLowerCase().includes(filter) ? "" : "none";
     });
 });
 
-// Live file search
-document.getElementById("fileSearch").addEventListener("keyup", function () {
+document.getElementById("fileSearch")?.addEventListener("keyup", function() {
     let filter = this.value.toLowerCase();
-    let rows = document.querySelectorAll("#filesTable tbody tr");
-    rows.forEach(row => {
-        row.style.display = row.innerText.toLowerCase().includes(filter) ? "" : "none";
+    document.querySelectorAll("#filesTable tbody tr").forEach(row => {
+        row.style.display = row.textContent.toLowerCase().includes(filter) ? "" : "none";
     });
 });
 
-// Delete user functionality
+// Delete confirmation
 document.querySelectorAll('.delete-user-btn').forEach(btn => {
     btn.addEventListener('click', function() {
-        let userId = this.getAttribute('data-userid');
-        let username = this.getAttribute('data-username');
-        document.getElementById('deleteUsername').textContent = username;
-        document.getElementById('deleteForm').action = "{{ url_for('admin_delete_user', user_id=0) }}".replace('0', userId);
+        document.getElementById('deleteUsername').textContent = this.getAttribute('data-username');
+        document.getElementById('deleteForm').action = "{{ url_for('admin_delete_user', user_id=0) }}".replace('0', this.getAttribute('data-userid'));
     });
 });
 </script>
