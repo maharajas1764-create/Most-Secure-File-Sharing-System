@@ -4,6 +4,7 @@ import hashlib
 import smtplib
 import random
 import string
+import re
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from datetime import datetime, timedelta
@@ -421,7 +422,7 @@ def download_file(share_id):
     file = File.query.filter_by(share_id=share_id).first()
 
     if not file:
-        flash('File not found!', 'danger')
+        flash('File Not Found!', 'danger')
         return redirect(url_for('index'))
 
     now = datetime.now()
@@ -457,10 +458,10 @@ def download_file(share_id):
                 db.session.delete(file)
                 db.session.commit()
 
-                flash('Maximum attempts reached! File permanently corrupted.', 'danger')
+                flash('Maximum Attempts Reached...! File Permanently Deleted...!', 'danger')
                 return redirect(url_for('index'))
 
-            flash(f'Invalid password! {remaining} attempts remaining.', 'danger')
+            flash(f'Invalid Password! {remaining} Attempts Remaining...!', 'danger')
             return redirect(url_for('download_file', share_id=share_id))
 
         file.failed_attempts = 0
@@ -498,10 +499,8 @@ def delete_file(file_id):
     
     return redirect(url_for('dashboard'))
 
-# NEW: Check if email exists in database
 @app.route('/check-email', methods=['POST'])
 def check_email():
-    """Check if email is registered"""
     try:
         data = request.get_json()
         email = data.get('email')
@@ -524,10 +523,8 @@ def check_email():
         print(f"Error in check_email: {str(e)}")
         return jsonify({'exists': False, 'message': 'Server error occurred'})
 
-# NEW: Send OTP for password reset
 @app.route('/send-otp', methods=['POST'])
 def send_otp():
-    """Send OTP via email"""
     try:
         data = request.get_json()
         email = data.get('email')
@@ -537,13 +534,11 @@ def send_otp():
         if not email or not otp:
             return jsonify({'success': False, 'message': 'Missing email or OTP'})
         
-        # Store OTP in session for verification
         session['password_reset_otp'] = otp
         session['otp_email'] = email
         session['otp_time'] = datetime.now().timestamp()
         session['otp_attempts'] = 0
         
-        # Send email
         if send_otp_email(email, otp, username):
             return jsonify({'success': True, 'message': 'OTP sent successfully'})
         else:
@@ -553,11 +548,10 @@ def send_otp():
         print(f"Error in send_otp: {str(e)}")
         return jsonify({'success': False, 'message': 'Server error occurred'})
 
-# UPDATED: Forget password route with OTP verification
+
 @app.route('/forget_password', methods=['GET', 'POST'])
 def forget_password():
     if request.method == 'POST':
-        # Check if OTP was verified
         otp_verified = request.form.get('otp_verified')
         email = request.form.get('email')
         
@@ -580,23 +574,20 @@ def forget_password():
             flash('Password must be at least 8 characters long!', 'danger')
             return redirect(url_for('forget_password'))
         
-        # Find user by email
         user = User.query.filter_by(email=email).first()
         
         if not user:
             flash('User not found!', 'danger')
             return redirect(url_for('forget_password'))
         
-        # Update password
         user.set_password(new_password)
         db.session.commit()
-        
-        # Clear OTP session
+    
         session.pop('password_reset_otp', None)
         session.pop('otp_time', None)
         session.pop('otp_attempts', None)
         
-        flash('Password changed successfully! Please login with your new password.', 'success')
+        flash('Password Changed Successfully...! Please Login with Your New Password...!', 'success')
         return redirect(url_for('login'))
     
     return render_template('forget_password.html')
@@ -624,40 +615,64 @@ def admin_delete_user(user_id):
     db.session.commit()
     flash('User and all associated files deleted successfully', 'success')
     return redirect(url_for('admin_dashboard'))
-    
-@app.route('/change_password', methods=['GET', 'POST'])
+
+@app.route('/update_profile', methods=['GET', 'POST'])
 @login_required
-def change_password():
+def update_profile():
     if request.method == 'POST':
         current_password = request.form.get('current_password')
-        new_password = request.form.get('new_password')
-        confirm_password = request.form.get('confirm_password')
-        
-        
-        # Verify current password
+        new_username = request.form.get('username', '').strip()
+        new_email = request.form.get('email', '').strip()
+        new_password = request.form.get('new_password', '')
+        confirm_password = request.form.get('confirm_password', '')
+ 
         if not current_user.check_password(current_password):
-            flash('Current password is incorrect!', 'danger')
-            return redirect(url_for('change_password'))
+            flash('Current password is incorrect! No changes were saved.', 'danger')
+            return redirect(url_for('update_profile'))
         
-        # Check if new password matches confirm
-        if new_password != confirm_password:
-            flash('New passwords do not match!', 'danger')
-            return redirect(url_for('change_password'))
+        # Check if username is taken by another user
+        if new_username != current_user.username:
+            existing_user = User.query.filter_by(username=new_username).first()
+            if existing_user:
+                flash('Username already taken! Please choose another.', 'danger')
+                return redirect(url_for('update_profile'))
         
+        # Check if email is taken by another user
+        if new_email != current_user.email:
+            existing_email = User.query.filter_by(email=new_email).first()
+            if existing_email:
+                flash('Email already registered! Please use another email.', 'danger')
+                return redirect(url_for('update_profile'))
         
-        # Check if new password is same as old
-        if current_password == new_password:
-            flash('New password cannot be the same as current password!', 'danger')
-            return redirect(url_for('change_password'))
+        password_changed = False
+        if new_password or confirm_password:            
+            
+            if new_password == current_password:
+                flash('New password cannot be the same as your current password!', 'danger')
+                return redirect(url_for('update_profile'))
+            
+            current_user.set_password(new_password)
+            password_changed = True
         
-        # Update password
-        current_user.set_password(new_password)
-        db.session.commit()
+        current_user.username = new_username
+        current_user.email = new_email
         
-        flash('Password changed successfully! Please use your new password next time.', 'success')
+        try:
+            db.session.commit()
+            
+            if password_changed:
+                flash('✅ Profile updated successfully! Your password has been changed. Please use your new password next time.', 'success')
+            else:
+                flash('✅ Profile updated successfully! Your username and email have been saved.', 'success')
+                
+        except Exception as e:
+            db.session.rollback()
+            flash('An error occurred while saving changes. Please try again.', 'danger')
+            return redirect(url_for('update_profile'))
+        
         return redirect(url_for('dashboard'))
     
-    return render_template('change_password.html')
+    return render_template('update_profile.html', current_user=current_user)
 
 if __name__ == '__main__':
     with app.app_context():
