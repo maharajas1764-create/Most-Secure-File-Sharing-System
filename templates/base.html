@@ -24,8 +24,11 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-light">
         <div class="container">
-            <a class="navbar-brand fw-bold" href="{{ url_for('index') }}">
-                <i class="bi bi-shield-lock"></i> SecureFileShare
+            <a class="navbar-brand fw-bold d-flex align-items-center" href="{{ url_for('index') }}">
+            <img src="{{ url_for('static', filename='images/logo.png') }}" 
+                alt="Logo" 
+                height="100" 
+                class="me-2">
             </a>
             {% if current_user.is_authenticated %}
             <div class="navbar-nav ms-auto">
