@@ -17,6 +17,7 @@ from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.backends import default_backend
+from flask import send_from_directory
 import base64
 from sqlalchemy import inspect
 import json
@@ -90,8 +91,8 @@ def send_otp_email(recipient_email, otp, username):
 
 class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(80), unique=True, nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
+    username = db.Column(db.String(30), unique=True, nullable=False)
+    email = db.Column(db.String(50), unique=True, nullable=False)
     password_hash = db.Column(db.String(200), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.now)
     last_login = db.Column(db.DateTime, nullable=True)
@@ -121,6 +122,12 @@ class File(db.Model):
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
+
+
+@app.route('/images/<filename>')
+def images(filename):
+    return send_from_directory('images', filename)
+
 
 def generate_key_from_password(password, salt):
     kdf = PBKDF2HMAC(
@@ -213,7 +220,7 @@ def admin_login():
         username = request.form.get('username')
         password = request.form.get('password')
         
-        if username == 'admin' and password == 'admin123':
+        if username == 'Admin' and password == 'Admin123':
             session['admin_logged_in'] = True
             flash('Admin login successful!', 'success')
             return redirect(url_for('admin_dashboard'))
@@ -417,6 +424,7 @@ def share_file(share_id):
     share_url = f"{request.host_url}download/{share_id}"
     return render_template('share.html', file=file, share_url=share_url, now=now, is_expired=is_expired)
 
+d=0
 @app.route('/download/<share_id>', methods=['GET', 'POST'])
 def download_file(share_id):
     file = File.query.filter_by(share_id=share_id).first()
@@ -468,11 +476,16 @@ def download_file(share_id):
         db.session.commit()
 
         from io import BytesIO
-        return send_file(
-            BytesIO(decrypted_data),
-            as_attachment=True,
-            download_name=file.filename
-        )
+        global d
+        if(d==0):
+            d=1
+            return send_file(
+                BytesIO(decrypted_data),
+                as_attachment=True,
+                download_name=file.filename
+            )
+        else:
+            flash("Already Downloaded..!",'danger')
 
     return render_template('download.html', file=file, now=now)
 
@@ -661,9 +674,9 @@ def update_profile():
             db.session.commit()
             
             if password_changed:
-                flash('✅ Profile updated successfully! Your password has been changed. Please use your new password next time.', 'success')
+                flash('Profile updated successfully! Your password has been changed. Please use your new password next time.', 'success')
             else:
-                flash('✅ Profile updated successfully! Your username and email have been saved.', 'success')
+                flash('Profile updated successfully! Your username and email have been saved.', 'success')
                 
         except Exception as e:
             db.session.rollback()
